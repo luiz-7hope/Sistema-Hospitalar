@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare - Sistema Hospitalar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-icon">⚕️</span>
+                <h1>MediCare</h1>
+                <span class="subtitle">Sistema de Gerenciamento Hospitalar</span>
+            </div>
+            <div class="nav-status">
+                <span class="status-info">Pacientes: <span id="totalPacientes">0</span></span>
+                <span class="status-info">Medicamentos: <span id="totalMedicamentos">0</span></span>
+                <span class="status-info" id="usuarioInfo" style="display: flex; align-items: center; gap: 10px;">
+                    <span id="usuarioNome"></span>
+                </span>
+                <button class="btn-logout" onclick="realizarLogout()">🚪 Sair</button>
+            </div>
+        </nav>
+
+        <!-- Menu de Abas -->
+        <div class="tab-menu">
+            <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+            <button class="tab-btn" data-tab="pacientes">👥 Pacientes</button>
+            <button class="tab-btn" data-tab="medicamentos">💊 Medicamentos</button>
+            <button class="tab-btn" data-tab="registro">📝 Registro de Uso</button>
+            <button class="tab-btn" data-tab="fatura">💰 Faturas</button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="card-info">
+                    <h3>Pacientes Internados</h3>
+                    <p class="big-number" id="dashPacientes">0</p>
+                </div>
+                <div class="card-info">
+                    <h3>Total de Medicamentos</h3>
+                    <p class="big-number" id="dashMedicamentos">0</p>
+                </div>
+                <div class="card-info">
+                    <h3>Registros de Uso</h3>
+                    <p class="big-number" id="dashUsos">0</p>
+                </div>
+                <div class="card-info">
+                    <h3>Valor Total Pendente</h3>
+                    <p class="big-number" id="dashTotal">R$ 0,00</p>
+                </div>
+            </div>
+            <div class="dashboard-chart">
+                <h3>Últimos Registros de Uso</h3>
+                <div id="ultimosRegistros" class="ultimos-registros"></div>
+            </div>
+        </section>
+
+        <!-- PACIENTES -->
+        <section id="pacientes" class="tab-content">
+            <div class="section-header">
+                <h2>Gerenciamento de Pacientes</h2>
+            </div>
+
+            <div class="form-container">
+                <div class="form-group">
+                    <label>Nome do Paciente:</label>
+                    <input type="text" id="nomePaciente" placeholder="Digite o nome completo">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CPF:</label>
+                        <input type="text" id="cpfPaciente" placeholder="000.000.000-00">
+                    </div>
+                    <div class="form-group">
+                        <label>Plano de Saúde:</label>
+                        <input type="text" id="planoSaudePaciente" placeholder="Ex: Unimed, Bradesco">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Número do Leito:</label>
+                        <input type="text" id="leitoPaciente" placeholder="Ex: A101">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Internação:</label>
+                        <input type="date" id="dataInternacaoPaciente">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="statusPaciente">
+                        <option value="Internado">Internado</option>
+                        <option value="Alta Médica">Alta Médica</option>
+                        <option value="Crítico">Crítico</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="adicionarPaciente()">➕ Adicionar Paciente</button>
+            </div>
+
+            <div class="tabela-container">
+                <h3>Lista de Pacientes</h3>
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Leito</th>
+                            <th>Plano</th>
+                            <th>Data Internação</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaPacientes"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- MEDICAMENTOS -->
+        <section id="medicamentos" class="tab-content">
+            <div class="section-header">
+                <h2>Gerenciamento de Medicamentos</h2>
+            </div>
+
+            <div class="form-container">
+                <div class="form-group">
+                    <label>Nome do Medicamento:</label>
+                    <input type="text" id="nomeMedicamento" placeholder="Ex: Dipirona 500mg">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Código/Registro:</label>
+                        <input type="text" id="codigoMedicamento" placeholder="Ex: MED001">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria:</label>
+                        <select id="categoriaMedicamento">
+                            <option value="Analgésico">Analgésico</option>
+                            <option value="Antibiótico">Antibiótico</option>
+                            <option value="Anti-inflamatório">Anti-inflamatório</option>
+                            <option value="Antimicrobiano">Antimicrobiano</option>
+                            <option value="Vitamina">Vitamina</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Preço Unitário (R$):</label>
+                        <input type="number" id="precoMedicamento" placeholder="0,00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade em Estoque:</label>
+                        <input type="number" id="estoqueMedicamento" placeholder="0">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="adicionarMedicamento()">➕ Adicionar Medicamento</button>
+            </div>
+
+            <div class="tabela-container">
+                <h3>Estoque de Medicamentos</h3>
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Medicamento</th>
+                            <th>Código</th>
+                            <th>Categoria</th>
+                            <th>Preço Unit.</th>
+                            <th>Estoque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaMedicamentos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- REGISTRO DE USO -->
+        <section id="registro" class="tab-content">
+            <div class="section-header">
+                <h2>Registro de Uso de Medicamentos</h2>
+            </div>
+
+            <div class="form-container">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Paciente:</label>
+                        <select id="pacienteUso">
+                            <option value="">Selecione um paciente...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Medicamento:</label>
+                        <select id="medicamentoUso">
+                            <option value="">Selecione um medicamento...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Quantidade Utilizada:</label>
+                        <input type="number" id="quantidadeUso" placeholder="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Uso:</label>
+                        <input type="datetime-local" id="dataUso">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Observações:</label>
+                    <textarea id="observacoesUso" placeholder="Adicione observações sobre o uso..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="registrarUso()">📝 Registrar Uso</button>
+            </div>
+
+            <div class="tabela-container">
+                <h3>Histórico de Uso</h3>
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Medicamento</th>
+                            <th>Quantidade</th>
+                            <th>Data/Hora</th>
+                            <th>Observações</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaRegistros"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- FATURAS -->
+        <section id="fatura" class="tab-content">
+            <div class="section-header">
+                <h2>Faturas e Cobranças</h2>
+            </div>
+
+            <div class="filter-container">
+                <input type="text" id="filtroFatura" placeholder="🔍 Filtrar por paciente...">
+                <select id="statusFiltro">
+                    <option value="">Todos os Status</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Pago">Pago</option>
+                </select>
+            </div>
+
+            <div class="tabela-container">
+                <h3>Faturas de Pacientes</h3>
+                <div id="faturasList" class="faturas-list"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <h2 id="modalTitle">Confirmação</h2>
+            <p id="modalMessage"></p>
+            <div class="modal-buttons">
+                <button class="btn-primary" id="modalConfirm">Confirmar</button>
+                <button class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ================== AUTENTICAÇÃO ==================
+        function verificarAutenticacao() {
+            const usuarioLogado = localStorage.getItem('usuarioLogado');
+            if (!usuarioLogado) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        function realizarLogout() {
+            const confirmado = confirm('Tem certeza que deseja sair?');
+            if (confirmado) {
+                localStorage.removeItem('usuarioLogado');
+                mostrarToast('👋 Logout realizado com sucesso!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
+            }
+        }
+
+        function atualizarInfoUsuario() {
+            const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+            if (usuarioLogado) {
+                document.getElementById('usuarioNome').textContent = `👤 ${usuarioLogado.nome.split(' ')[0]}`;
+            }
+        }
+
+        // ================== DADOS ==================
+        let dados = {
+            pacientes: [],
+            medicamentos: [],
+            registros: []
+        };
+
+        // Carregar dados do localStorage
+        function carregarDados() {
+            const dadosSalvos = localStorage.getItem('medicareDados');
+            if (dadosSalvos) {
+                dados = JSON.parse(dadosSalvos);
+            }
+        }
+
+        // Salvar dados no localStorage
+        function salvarDados() {
+            localStorage.setItem('medicareDados', JSON.stringify(dados));
+            atualizarDashboard();
+            atualizarSelects();
+        }
+
+        // ================== PACIENTES ==================
+        function adicionarPaciente() {
+            const nome = document.getElementById('nomePaciente').value;
+            const cpf = document.getElementById('cpfPaciente').value;
+            const plano = document.getElementById('planoSaudePaciente').value;
+            const leito = document.getElementById('leitoPaciente').value;
+            const dataInternacao = document.getElementById('dataInternacaoPaciente').value;
+            const status = document.getElementById('statusPaciente').value;
+
+            if (!nome || !cpf || !leito || !dataInternacao) {
+                mostrarToast('⚠️ Preenchimento obrigatório!', 'error');
+                return;
+            }
+
+            const paciente = {
+                id: Date.now(),
+                nome,
+                cpf,
+                plano,
+                leito,
+                dataInternacao,
+                status,
+                dataCadastro: new Date().toLocaleString('pt-BR')
+            };
+
+            dados.pacientes.push(paciente);
+            salvarDados();
+            limparFormPaciente();
+            mostrarToast('✅ Paciente adicionado com sucesso!', 'success');
+            atualizarTabelaPacientes();
+        }
+
+        function limparFormPaciente() {
+            document.getElementById('nomePaciente').value = '';
+            document.getElementById('cpfPaciente').value = '';
+            document.getElementById('planoSaudePaciente').value = '';
+            document.getElementById('leitoPaciente').value = '';
+            document.getElementById('dataInternacaoPaciente').value = '';
+            document.getElementById('statusPaciente').value = 'Internado';
+        }
+
+        function atualizarTabelaPacientes() {
+            const tabela = document.getElementById('tabelaPacientes');
+            tabela.innerHTML = '';
+
+            dados.pacientes.forEach(paciente => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${paciente.nome}</td>
+                    <td>${paciente.cpf}</td>
+                    <td>${paciente.leito}</td>
+                    <td>${paciente.plano}</td>
+                    <td>${new Date(paciente.dataInternacao).toLocaleDateString('pt-BR')}</td>
+                    <td><span class="status-badge status-${paciente.status.toLowerCase()}">${paciente.status}</span></td>
+                    <td>
+                        <button class="btn-small btn-edit" onclick="editarPaciente(${paciente.id})">Editar</button>
+                        <button class="btn-small btn-delete" onclick="deletarPaciente(${paciente.id})">Deletar</button>
+                    </td>
+                `;
+                tabela.appendChild(tr);
+            });
+        }
+
+        function deletarPaciente(id) {
+            dados.pacientes = dados.pacientes.filter(p => p.id !== id);
+            salvarDados();
+            atualizarTabelaPacientes();
+            mostrarToast('✅ Paciente removido!', 'success');
+        }
+
+        // ================== MEDICAMENTOS ==================
+        function adicionarMedicamento() {
+            const nome = document.getElementById('nomeMedicamento').value;
+            const codigo = document.getElementById('codigoMedicamento').value;
+            const categoria = document.getElementById('categoriaMedicamento').value;
+            const preco = parseFloat(document.getElementById('precoMedicamento').value);
+            const estoque = parseInt(document.getElementById('estoqueMedicamento').value);
+
+            if (!nome || !codigo || !preco || !estoque) {
+                mostrarToast('⚠️ Preenchimento obrigatório!', 'error');
+                return;
+            }
+
+            const medicamento = {
+                id: Date.now(),
+                nome,
+                codigo,
+                categoria,
+                preco,
+                estoque,
+                dataCadastro: new Date().toLocaleString('pt-BR')
+            };
+
+            dados.medicamentos.push(medicamento);
+            salvarDados();
+            limparFormMedicamento();
+            mostrarToast('✅ Medicamento adicionado com sucesso!', 'success');
+            atualizarTabelaMedicamentos();
+        }
+
+        function limparFormMedicamento() {
+            document.getElementById('nomeMedicamento').value = '';
+            document.getElementById('codigoMedicamento').value = '';
+            document.getElementById('categoriaMedicamento').value = 'Analgésico';
+            document.getElementById('precoMedicamento').value = '';
+            document.getElementById('estoqueMedicamento').value = '';
+        }
+
+        function atualizarTabelaMedicamentos() {
+            const tabela = document.getElementById('tabelaMedicamentos');
+            tabela.innerHTML = '';
+
+            dados.medicamentos.forEach(med => {
+                const tr = document.createElement('tr');
+                const estoqueClass = med.estoque < 10 ? 'estoque-baixo' : 'estoque-ok';
+                tr.innerHTML = `
+                    <td>${med.nome}</td>
+                    <td>${med.codigo}</td>
+                    <td>${med.categoria}</td>
+                    <td>R$ ${med.preco.toFixed(2)}</td>
+                    <td><span class="${estoqueClass}">${med.estoque}</span></td>
+                    <td>
+                        <button class="btn-small btn-edit" onclick="editarMedicamento(${med.id})">Editar</button>
+                        <button class="btn-small btn-delete" onclick="deletarMedicamento(${med.id})">Deletar</button>
+                    </td>
+                `;
+                tabela.appendChild(tr);
+            });
+        }
+
+        function deletarMedicamento(id) {
+            dados.medicamentos = dados.medicamentos.filter(m => m.id !== id);
+            salvarDados();
+            atualizarTabelaMedicamentos();
+            mostrarToast('✅ Medicamento removido!', 'success');
+        }
+
+        // ================== REGISTROS DE USO ==================
+        function registrarUso() {
+            const pacienteId = document.getElementById('pacienteUso').value;
+            const medicamentoId = document.getElementById('medicamentoUso').value;
+            const quantidade = parseInt(document.getElementById('quantidadeUso').value);
+            const dataUso = document.getElementById('dataUso').value;
+            const observacoes = document.getElementById('observacoesUso').value;
+
+            if (!pacienteId || !medicamentoId || !quantidade || !dataUso) {
+                mostrarToast('⚠️ Preenchimento obrigatório!', 'error');
+                return;
+            }
+
+            const paciente = dados.pacientes.find(p => p.id == pacienteId);
+            const medicamento = dados.medicamentos.find(m => m.id == medicamentoId);
+
+            if (!paciente || !medicamento) {
+                mostrarToast('❌ Paciente ou medicamento não encontrado!', 'error');
+                return;
+            }
+
+            if (medicamento.estoque < quantidade) {
+                mostrarToast('❌ Estoque insuficiente!', 'error');
+                return;
+            }
+
+            // Decrementar estoque
+            medicamento.estoque -= quantidade;
+
+            const registro = {
+                id: Date.now(),
+                pacienteId,
+                pacienteNome: paciente.nome,
+                medicamentoId,
+                medicamentoNome: medicamento.nome,
+                quantidade,
+                preco: medicamento.preco * quantidade,
+                dataUso,
+                observacoes,
+                dataCadastro: new Date().toLocaleString('pt-BR')
+            };
+
+            dados.registros.push(registro);
+            salvarDados();
+            limparFormUso();
+            mostrarToast('✅ Uso registrado com sucesso!', 'success');
+            atualizarTabelaRegistros();
+        }
+
+        function limparFormUso() {
+            document.getElementById('pacienteUso').value = '';
+            document.getElementById('medicamentoUso').value = '';
+            document.getElementById('quantidadeUso').value = '1';
+            document.getElementById('dataUso').value = '';
+            document.getElementById('observacoesUso').value = '';
+        }
+
+        function atualizarTabelaRegistros() {
+            const tabela = document.getElementById('tabelaRegistros');
+            tabela.innerHTML = '';
+
+            dados.registros.forEach(reg => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${reg.pacienteNome}</td>
+                    <td>${reg.medicamentoNome}</td>
+                    <td>${reg.quantidade}</td>
+                    <td>${new Date(reg.dataUso).toLocaleString('pt-BR')}</td>
+                    <td>${reg.observacoes}</td>
+                    <td>
+                        <button class="btn-small btn-delete" onclick="deletarRegistro(${reg.id})">Deletar</button>
+                    </td>
+                `;
+                tabela.appendChild(tr);
+            });
+        }
+
+        function deletarRegistro(id) {
+            const registro = dados.registros.find(r => r.id === id);
+            const medicamento = dados.medicamentos.find(m => m.id === registro.medicamentoId);
+            medicamento.estoque += registro.quantidade;
+            dados.registros = dados.registros.filter(r => r.id !== id);
+            salvarDados();
+            atualizarTabelaRegistros();
+            mostrarToast('✅ Registro removido!', 'success');
+        }
+
+        // ================== FATURAS ==================
+        function gerarFaturas() {
+            const container = document.getElementById('faturasList');
+            container.innerHTML = '';
+
+            const filtro = document.getElementById('filtroFatura').value.toLowerCase();
+            const statusFiltro = document.getElementById('statusFiltro').value;
+
+            dados.pacientes.forEach(paciente => {
+                const registrosPaciente = dados.registros.filter(r => r.pacienteId === paciente.id);
+                if (registrosPaciente.length === 0) return;
+
+                const total = registrosPaciente.reduce((sum, r) => sum + r.preco, 0);
+                const status = paciente.status === 'Internado' ? 'Pendente' : 'Pago';
+
+                if (filtro && !paciente.nome.toLowerCase().includes(filtro)) return;
+                if (statusFiltro && statusFiltro !== status) return;
+
+                const fatura = document.createElement('div');
+                fatura.className = `fatura-card status-${status.toLowerCase()}`;
+                fatura.innerHTML = `
+                    <div class="fatura-header">
+                        <h3>${paciente.nome}</h3>
+                        <span class="status-badge status-${status.toLowerCase()}">${status}</span>
+                    </div>
+                    <div class="fatura-details">
+                        <p><strong>Leito:</strong> ${paciente.leito}</p>
+                        <p><strong>Plano:</strong> ${paciente.plano}</p>
+                        <p><strong>Internação:</strong> ${new Date(paciente.dataInternacao).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div class="fatura-items">
+                        <h4>Medicamentos Utilizados:</h4>
+                        ${registrosPaciente.map(r => `
+                            <div class="item-fatura">
+                                <span>${r.medicamentoNome} x${r.quantidade}</span>
+                                <span>R$ ${r.preco.toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="fatura-total">
+                        <strong>Total: R$ ${total.toFixed(2)}</strong>
+                    </div>
+                    <div class="fatura-actions">
+                        <button class="btn-small btn-print" onclick="imprimirFatura('${paciente.nome}', ${total})">🖨️ Imprimir</button>
+                        <button class="btn-small btn-success" onclick="marcarComoPago('${paciente.nome}')">✓ Marcar Pago</button>
+                    </div>
+                `;
+                container.appendChild(fatura);
+            });
+
+            if (container.innerHTML === '') {
+                container.innerHTML = '<p class="no-data">Nenhuma fatura encontrada</p>';
+            }
+        }
+
+        function imprimirFatura(nomePaciente, valor) {
+            mostrarToast(`🖨️ Imprimindo fatura de ${nomePaciente}...`, 'info');
+        }
+
+        function marcarComoPago(nomePaciente) {
+            mostrarToast(`✅ Fatura de ${nomePaciente} marcada como paga!`, 'success');
+        }
+
+        // ================== SELECTS ==================
+        function atualizarSelects() {
+            const pacienteSelect = document.getElementById('pacienteUso');
+            const medicamentoSelect = document.getElementById('medicamentoUso');
+
+            pacienteSelect.innerHTML = '<option value="">Selecione um paciente...</option>';
+            medicamentoSelect.innerHTML = '<option value="">Selecione um medicamento...</option>';
+
+            dados.pacientes.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = `${p.nome} - Leito ${p.leito}`;
+                pacienteSelect.appendChild(option);
+            });
+
+            dados.medicamentos.forEach(m => {
+                const option = document.createElement('option');
+                option.value = m.id;
+                option.textContent = `${m.nome} (${m.codigo}) - R$ ${m.preco.toFixed(2)}`;
+                medicamentoSelect.appendChild(option);
+            });
+        }
+
+        // ================== DASHBOARD ==================
+        function atualizarDashboard() {
+            document.getElementById('dashPacientes').textContent = dados.pacientes.length;
+            document.getElementById('dashMedicamentos').textContent = dados.medicamentos.length;
+            document.getElementById('dashUsos').textContent = dados.registros.length;
+
+            const totalPendente = dados.registros.reduce((sum, r) => {
+                const paciente = dados.pacientes.find(p => p.id === r.pacienteId);
+                return paciente && paciente.status === 'Internado' ? sum + r.preco : sum;
+            }, 0);
+
+            document.getElementById('dashTotal').textContent = `R$ ${totalPendente.toFixed(2)}`;
+            document.getElementById('totalPacientes').textContent = dados.pacientes.length;
+            document.getElementById('totalMedicamentos').textContent = dados.medicamentos.length;
+
+            // Últimos registros
+            const ultimosRegistros = document.getElementById('ultimosRegistros');
+            ultimosRegistros.innerHTML = '';
+            dados.registros.slice(-5).reverse().forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'registro-item';
+                div.innerHTML = `
+                    <strong>${r.pacienteNome}</strong> utilizou <strong>${r.medicamentoNome}</strong> 
+                    (${r.quantidade}x) em <strong>${new Date(r.dataUso).toLocaleString('pt-BR')}</strong>
+                    <span class="preco">R$ ${r.preco.toFixed(2)}</span>
+                `;
+                ultimosRegistros.appendChild(div);
+            });
+
+            if (ultimosRegistros.innerHTML === '') {
+                ultimosRegistros.innerHTML = '<p class="no-data">Nenhum registro ainda</p>';
+            }
+        }
+
+        // ================== ABAS ==================
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+
+                if (btn.dataset.tab === 'fatura') {
+                    gerarFaturas();
+                }
+            });
+        });
+
+        document.getElementById('filtroFatura').addEventListener('keyup', gerarFaturas);
+        document.getElementById('statusFiltro').addEventListener('change', gerarFaturas);
+
+        // ================== NOTIFICAÇÕES ==================
+        function mostrarToast(mensagem, tipo = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.className = `toast toast-${tipo} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ================== MODAL ==================
+        function fecharModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // ================== INICIALIZAÇÃO ==================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar autenticação
+            if (!verificarAutenticacao()) {
+                return;
+            }
+
+            atualizarInfoUsuario();
+            carregarDados();
+            atualizarTabelaPacientes();
+            atualizarTabelaMedicamentos();
+            atualizarTabelaRegistros();
+            atualizarDashboard();
+            atualizarSelects();
+
+            // Set data atual para registro de uso
+            const now = new Date().toISOString().slice(0, 16);
+            document.getElementById('dataUso').value = now;
+        });
+    </script>
+</body>
+</html>

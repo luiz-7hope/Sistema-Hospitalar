@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare - Login</title>
+    <style>
+        :root {
+            --color-primary: #00ff41;
+            --color-secondary: #ff006e;
+            --color-tertiary: #00d9ff;
+            --color-accent: #b537f2;
+            --color-bg-dark: #0a0e27;
+            --color-bg-darker: #050812;
+            --color-bg-light: #1a1f3a;
+            --color-text-primary: #e0e0e0;
+            --color-text-secondary: #a0a0a0;
+            --color-border: #00ff4130;
+            --glow: 0 0 10px rgba(0, 255, 65, 0.5);
+            --glow-secondary: 0 0 15px rgba(255, 0, 110, 0.4);
+            --glow-tertiary: 0 0 15px rgba(0, 217, 255, 0.4);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #050812 50%, #1a1f3a 100%);
+            color: var(--color-text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            perspective: 1000px;
+        }
+
+        .login-box {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.95) 0%, rgba(181, 55, 242, 0.1) 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: var(--glow), var(--shadow);
+            animation: boxSlideIn 0.6s ease;
+        }
+
+        @keyframes boxSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--color-tertiary);
+        }
+
+        .logo-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            color: var(--color-primary);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .logo-section p {
+            color: var(--color-tertiary);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--color-tertiary);
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid var(--color-border);
+            color: var(--color-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: rgba(10, 14, 39, 0.95);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+
+        input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, #00cc33 100%);
+            color: var(--color-bg-dark);
+            border: none;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 14px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .form-footer p {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .form-footer a {
+            color: var(--color-secondary);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .form-footer a:hover {
+            color: var(--color-primary);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.95) 0%, rgba(181, 55, 242, 0.1) 100%);
+            color: var(--color-primary);
+            padding: 15px 25px;
+            border: 2px solid var(--color-primary);
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            transition: all 0.3s ease;
+            z-index: 1001;
+            letter-spacing: 0.5px;
+        }
+
+        .toast.show {
+            bottom: 30px;
+        }
+
+        .toast-error {
+            border-color: #ff1744;
+            color: #ff1744;
+            box-shadow: 0 0 20px rgba(255, 23, 68, 0.5);
+        }
+
+        .toast-success {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+            accent-color: var(--color-primary);
+        }
+
+        .demo-info {
+            background: rgba(0, 217, 255, 0.1);
+            border-left: 3px solid var(--color-tertiary);
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 11px;
+            color: var(--color-tertiary);
+        }
+
+        .demo-info strong {
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 25px;
+            }
+
+            .logo-section h1 {
+                font-size: 22px;
+            }
+
+            .logo-icon {
+                font-size: 36px;
+            }
+
+            .login-container {
+                padding: 15px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(10, 14, 39, 0.8);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-tertiary) 100%);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo-section">
+                <span class="logo-icon">⚕️</span>
+                <h1>MediCare</h1>
+                <p>Sistema Hospitalar</p>
+            </div>
+
+            <div class="demo-info">
+                <strong>Demo:</strong> Email: admin@medicare.com | Senha: 123456
+            </div>
+
+            <form id="loginForm" onsubmit="realizarLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" placeholder="••••••••" required>
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="lembrar" name="lembrar">
+                    <label for="lembrar" style="margin: 0;">Lembrar-me</label>
+                </div>
+
+                <button type="submit" class="btn-login">🔓 Entrar</button>
+            </form>
+
+            <div class="form-footer">
+                <p>Não tem uma conta?</p>
+                <a href="signup.html">Criar Conta Agora</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Verificar se já está logado
+        window.addEventListener('load', () => {
+            const usuarioLogado = localStorage.getItem('usuarioLogado');
+            if (usuarioLogado) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        function realizarLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const lembrar = document.getElementById('lembrar').checked;
+
+            // Verificar credenciais
+            const usuariosSalvos = JSON.parse(localStorage.getItem('usuariosMedicare') || '[]');
+            const usuarioEncontrado = usuariosSalvos.find(u => u.email === email && u.senha === senha);
+
+            if (!usuarioEncontrado) {
+                mostrarToast('❌ Email ou senha incorretos!', 'error');
+                return;
+            }
+
+            // Salvar dados de login
+            const dadosLogin = {
+                id: usuarioEncontrado.id,
+                nome: usuarioEncontrado.nome,
+                email: usuarioEncontrado.email,
+                cargo: usuarioEncontrado.cargo
+            };
+
+            localStorage.setItem('usuarioLogado', JSON.stringify(dadosLogin));
+
+            if (lembrar) {
+                localStorage.setItem('emailLembrado', email);
+            }
+
+            mostrarToast('✅ Login realizado com sucesso!', 'success');
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        function mostrarToast(mensagem, tipo = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.className = `toast toast-${tipo} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Preencher email se foi lembrado
+        window.addEventListener('load', () => {
+            const emailLembrado = localStorage.getItem('emailLembrado');
+            if (emailLembrado) {
+                document.getElementById('email').value = emailLembrado;
+                document.getElementById('lembrar').checked = true;
+            }
+        });
+
+        // Criar usuário de demo se não existir
+        window.addEventListener('load', () => {
+            let usuariosSalvos = JSON.parse(localStorage.getItem('usuariosMedicare') || '[]');
+            
+            const usuarioDemo = usuariosSalvos.find(u => u.email === 'admin@medicare.com');
+            
+            if (!usuarioDemo) {
+                usuariosSalvos.push({
+                    id: Date.now(),
+                    nome: 'Administrador',
+                    email: 'admin@medicare.com',
+                    senha: '123456',
+                    cargo: 'Administrador',
+                    dataCadastro: new Date().toLocaleString('pt-BR')
+                });
+                localStorage.setItem('usuariosMedicare', JSON.stringify(usuariosSalvos));
+            }
+        });
+    </script>
+</body>
+</html>
